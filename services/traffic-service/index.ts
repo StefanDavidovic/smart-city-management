@@ -72,20 +72,20 @@ connectToRabbitMQ();
 const INTERSECTIONS = [
   {
     id: "intersection-001",
-    name: "Trg Republike",
-    coordinates: [44.8176, 20.4565],
+    name: "Trg Slobode",
+    coordinates: [45.2671, 19.8335],
   },
-  { id: "intersection-002", name: "Slavija", coordinates: [44.8024, 20.4656] },
-  { id: "intersection-003", name: "Mostar", coordinates: [44.7896, 20.4206] },
+  { id: "intersection-002", name: "Liman", coordinates: [45.2500, 19.8500] },
+  { id: "intersection-003", name: "Detelinara", coordinates: [45.2800, 19.8200] },
   {
     id: "intersection-004",
-    name: "Zeleni Venac",
-    coordinates: [44.8142, 20.4565],
+    name: "Grbavica",
+    coordinates: [45.2600, 19.8100],
   },
   {
     id: "intersection-005",
-    name: "Knez Mihailova",
-    coordinates: [44.8176, 20.4565],
+    name: "Telep",
+    coordinates: [45.2400, 19.8400],
   },
 ];
 

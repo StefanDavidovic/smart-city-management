@@ -1,15 +1,21 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/Card";
+
+const FacilitiesApp = React.lazy(
+  () => import("facilitiesFrontend/FacilitiesApp")
+);
 
 const FacilitiesWidget: React.FC = () => {
   return (
     <div className="widget">
       <Card>
         <CardHeader>
-          <CardTitle>Facilities Widget</CardTitle>
+          <CardTitle>Public Facilities</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>Facilities widget content will be implemented here.</p>
+          <Suspense fallback={<div>Loading Facilities App...</div>}>
+            <FacilitiesApp />
+          </Suspense>
         </CardContent>
       </Card>
     </div>

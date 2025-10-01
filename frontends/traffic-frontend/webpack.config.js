@@ -3,8 +3,13 @@ const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPl
 
 module.exports = {
   mode: "development",
+  output: {
+    path: require("path").resolve(__dirname, "dist"),
+    publicPath: "auto",
+  },
   devServer: {
-    port: 3000,
+    port: 3002,
+    host: "0.0.0.0",
     historyApiFallback: true,
     headers: {
       "Access-Control-Allow-Origin": "*",

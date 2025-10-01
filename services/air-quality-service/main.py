@@ -76,11 +76,11 @@ rabbitmq_publisher.connect()
 init_database()
 
 SENSORS = [
-    {"id": "sensor-001", "location": "Centar", "coordinates": [44.7866, 20.4489]},
-    {"id": "sensor-002", "location": "Novi Beograd", "coordinates": [44.8058, 20.3833]},
-    {"id": "sensor-003", "location": "Zvezdara", "coordinates": [44.7870, 20.5156]},
-    {"id": "sensor-004", "location": "Vračar", "coordinates": [44.7992, 20.4706]},
-    {"id": "sensor-005", "location": "Stari Grad", "coordinates": [44.8176, 20.4565]},
+    {"id": "sensor-001", "location": "Centar", "coordinates": [45.2671, 19.8335]},
+    {"id": "sensor-002", "location": "Liman", "coordinates": [45.2500, 19.8500]},
+    {"id": "sensor-003", "location": "Detelinara", "coordinates": [45.2800, 19.8200]},
+    {"id": "sensor-004", "location": "Grbavica", "coordinates": [45.2600, 19.8100]},
+    {"id": "sensor-005", "location": "Telep", "coordinates": [45.2400, 19.8400]},
 ]
 
 class AirQualityData(BaseModel):
@@ -108,6 +108,21 @@ class AirQualityAlert(BaseModel):
 sensor_data: Dict[str, List[AirQualityData]] = {}
 active_connections: List[WebSocket] = []
 
+def calculate_aqi(pm25: float) -> int:
+    """Calculate Air Quality Index based on PM2.5 value"""
+    if pm25 <= 12.0:
+        return int(50 * pm25 / 12.0)
+    elif pm25 <= 35.4:
+        return int(50 + (100 - 50) * (pm25 - 12.0) / (35.4 - 12.0))
+    elif pm25 <= 55.4:
+        return int(100 + (150 - 100) * (pm25 - 35.4) / (55.4 - 35.4))
+    elif pm25 <= 150.4:
+        return int(150 + (200 - 150) * (pm25 - 55.4) / (150.4 - 55.4))
+    elif pm25 <= 250.4:
+        return int(200 + (300 - 200) * (pm25 - 150.4) / (250.4 - 150.4))
+    else:
+        return int(300 + (500 - 300) * (pm25 - 250.4) / (500.4 - 250.4))
+
 def generate_realistic_air_quality_data(sensor_id: str) -> AirQualityData:
     """Generate realistic air quality data based on time of day and location"""
     sensor = next(s for s in SENSORS if s["id"] == sensor_id)
@@ -119,7 +134,10 @@ def generate_realistic_air_quality_data(sensor_id: str) -> AirQualityData:
         "o3": 80.0,
         "no2": 35.0,
         "co": 1.2,
-        "so2": 12.0
+        "so2": 12.0,
+        "temperature": 22.0,
+        "humidity": 65.0,
+        "pressure": 1013.25
     }
     
     hour = now.hour
@@ -134,7 +152,14 @@ def generate_realistic_air_quality_data(sensor_id: str) -> AirQualityData:
     
     data = {}
     for key, base_value in base_values.items():
-        data[key] = round(base_value * multiplier * variation, 2)
+        if key in ["temperature", "humidity", "pressure"]:
+            data[key] = round(base_value * variation, 2)
+        else:
+            data[key] = round(base_value * multiplier * variation, 2)
+    
+    pm25_value = data["pm25"]
+    aqi = calculate_aqi(pm25_value)
+    data["aqi"] = aqi
     
     air_quality_data = AirQualityData(
         id=sensor_id,
@@ -145,8 +170,6 @@ def generate_realistic_air_quality_data(sensor_id: str) -> AirQualityData:
     )
     
     save_air_quality_data(sensor_id, data)
-    
-    pm25_value = data["pm25"]
     if pm25_value > 25:  # Unhealthy air quality threshold
         alert_event = {
             "event_type": "air_quality_alert",

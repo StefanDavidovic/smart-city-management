@@ -1,4 +1,3 @@
-
 export interface SensorData {
   id: string;
   location: string;
@@ -15,6 +14,10 @@ export interface AirQualityData extends SensorData {
     no2: number; // μg/m³
     co: number; // mg/m³
     so2: number; // μg/m³
+    temperature: number; // °C
+    humidity: number; // %
+    pressure: number; // hPa
+    aqi: number; // Air Quality Index
   };
 }
 
