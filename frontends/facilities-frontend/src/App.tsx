@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 
-interface Facility {
+interface PublicFacility {
   id: string;
   name: string;
   type: string;
@@ -9,19 +9,18 @@ interface Facility {
   coordinates: [number, number];
   capacity: number;
   currentOccupancy: number;
-  status: string;
-  amenities: string[];
   operatingHours: {
     open: string;
     close: string;
   };
-  lastUpdated: string;
+  amenities: string[];
+  status: string;
+  timestamp: string;
 }
 
 const App: React.FC = () => {
-  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [facilities, setFacilities] = useState<PublicFacility[]>([]);
   const [loading, setLoading] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [selectedType, setSelectedType] = useState<string>("all");
 
   useEffect(() => {
@@ -38,7 +37,6 @@ const App: React.FC = () => {
       );
       const result = await response.json();
       setFacilities(result);
-      setLastUpdate(new Date());
     } catch (error) {
       console.error("Error fetching facilities data:", error);
     } finally {
@@ -54,29 +52,27 @@ const App: React.FC = () => {
   };
 
   const getOccupancyColor = (percentage: number): string => {
-    if (percentage <= 30) return "#27ae60";
-    if (percentage <= 60) return "#f39c12";
-    if (percentage <= 80) return "#e67e22";
-    return "#e74c3c";
+    if (percentage < 50) return "#48bb78";
+    if (percentage < 80) return "#ed8936";
+    return "#f56565";
   };
 
   const getOccupancyStatus = (percentage: number): string => {
-    if (percentage <= 30) return "Low";
-    if (percentage <= 60) return "Moderate";
-    if (percentage <= 80) return "High";
-    return "Full";
+    if (percentage < 50) return "Low";
+    if (percentage < 80) return "Medium";
+    return "High";
   };
 
   const getStatusColor = (status: string): string => {
     switch (status.toLowerCase()) {
       case "open":
-        return "#27ae60";
+        return "#48bb78";
       case "closed":
-        return "#e74c3c";
+        return "#f56565";
       case "maintenance":
-        return "#f39c12";
+        return "#ed8936";
       default:
-        return "#95a5a6";
+        return "#718096";
     }
   };
 
@@ -94,6 +90,8 @@ const App: React.FC = () => {
         return "🏊";
       case "playground":
         return "🎠";
+      case "sports_center":
+        return "🏟️";
       default:
         return "🏛️";
     }
@@ -109,6 +107,25 @@ const App: React.FC = () => {
       ? facilities
       : facilities.filter((f) => f.type === selectedType);
 
+  const getOverallStats = () => {
+    const totalFacilities = facilities.length;
+    const openFacilities = facilities.filter((f) => f.status === "open").length;
+    const avgOccupancy =
+      facilities.length > 0
+        ? Math.round(
+            facilities.reduce(
+              (sum, f) =>
+                sum + getOccupancyPercentage(f.currentOccupancy, f.capacity),
+              0
+            ) / facilities.length
+          )
+        : 0;
+
+    return { totalFacilities, openFacilities, avgOccupancy };
+  };
+
+  const stats = getOverallStats();
+
   return (
     <div className="app">
       <main className="app-main">
@@ -116,7 +133,16 @@ const App: React.FC = () => {
           <div className="loading">Loading facilities data...</div>
         ) : (
           <>
-            <section className="facilities-controls">
+            {/* Header Section */}
+            <div className="header-section">
+              <h1 className="header-title">Public Facilities</h1>
+              <p className="header-subtitle">
+                Manage and monitor public facilities in Novi Sad
+              </p>
+            </div>
+
+            {/* Controls Section */}
+            <div className="facilities-controls">
               <div className="filter-section">
                 <label htmlFor="type-filter">Filter by type:</label>
                 <select
@@ -135,55 +161,41 @@ const App: React.FC = () => {
 
               <div className="stats-section">
                 <div className="stat-card">
-                  <div className="stat-number">{facilities.length}</div>
+                  <div className="stat-number">{stats.totalFacilities}</div>
                   <div className="stat-label">Total Facilities</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-number">
-                    {facilities.filter((f) => f.status === "open").length}
-                  </div>
+                  <div className="stat-number">{stats.openFacilities}</div>
                   <div className="stat-label">Currently Open</div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-number">
-                    {Math.round(
-                      facilities.reduce(
-                        (sum, f) =>
-                          sum +
-                          getOccupancyPercentage(
-                            f.currentOccupancy,
-                            f.capacity
-                          ),
-                        0
-                      ) / facilities.length
-                    ) || 0}
-                    %
-                  </div>
+                  <div className="stat-number">{stats.avgOccupancy}%</div>
                   <div className="stat-label">Avg. Occupancy</div>
                 </div>
               </div>
-            </section>
+            </div>
 
+            {/* Facilities Grid */}
             <section className="facilities-grid">
-              <h2>Facilities ({filteredFacilities.length})</h2>
+              <h2 className="section-title">
+                Facilities ({filteredFacilities.length})
+              </h2>
               <div className="facilities-container">
                 {filteredFacilities.map((facility) => (
                   <div key={facility.id} className="facility-card">
                     <div className="facility-header">
-                      <div className="facility-title">
-                        <span className="facility-icon">
-                          {getFacilityIcon(facility.type)}
-                        </span>
-                        <h3>{facility.name}</h3>
-                      </div>
-                      <div
-                        className="facility-status"
-                        style={{
-                          backgroundColor: getStatusColor(facility.status),
-                        }}
-                      >
-                        {facility.status.toUpperCase()}
-                      </div>
+                      <span className="facility-icon">
+                        {getFacilityIcon(facility.type)}
+                      </span>
+                      <h3 className="facility-title">{facility.name}</h3>
+                    </div>
+                    <div
+                      className="facility-status"
+                      style={{
+                        backgroundColor: getStatusColor(facility.status),
+                      }}
+                    >
+                      {facility.status.toUpperCase()}
                     </div>
 
                     <div className="facility-info">
@@ -256,23 +268,10 @@ const App: React.FC = () => {
                         </span>
                       </div>
                     </div>
-
-                    {facility.amenities.length > 0 && (
-                      <div className="amenities-section">
-                        <span className="info-label">Amenities:</span>
-                        <div className="amenities-list">
-                          {facility.amenities.map((amenity, index) => (
-                            <span key={index} className="amenity-tag">
-                              {amenity}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="facility-timestamp">
-                      Updated: {new Date(facility.lastUpdated).toLocaleString()}
-                    </div>
+                    <p className="facility-timestamp">
+                      Last updated:{" "}
+                      {new Date(facility.timestamp).toLocaleTimeString()}
+                    </p>
                   </div>
                 ))}
               </div>

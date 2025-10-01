@@ -18,6 +18,33 @@ body {
   flex-direction: column;
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.logo-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.logo-subtitle {
+  font-size: 0.875rem;
+  color: #718096;
+  font-weight: 500;
+}
+
 .app-content {
   display: flex;
   flex: 1;
@@ -27,6 +54,7 @@ body {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  height: calc(100vh - 80px);
 }
 
 .widget {

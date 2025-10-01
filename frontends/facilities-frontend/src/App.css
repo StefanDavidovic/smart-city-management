@@ -1,200 +1,222 @@
+/* Modern UI/UX Design for Facilities Frontend */
 .app {
   min-height: 100vh;
   background: white;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.app-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.app-header h1 {
-  margin: 0;
-  color: #2c3e50;
-  font-size: 2rem;
-  font-weight: 600;
-}
-
-.header-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.last-update {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.refresh-btn {
-  background: #27ae60;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease;
-}
-
-.refresh-btn:hover:not(:disabled) {
-  background: #229954;
-}
-
-.refresh-btn:disabled {
-  background: #bdc3c7;
-  cursor: not-allowed;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  color: #2d3748;
 }
 
 .app-main {
-  padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 .loading {
-  text-align: center;
-  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
   font-size: 1.2rem;
-  padding: 2rem;
+  color: #718096;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.facilities-controls {
+/* Header Section */
+.header-section {
   margin-bottom: 2rem;
+}
+
+.header-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.header-subtitle {
+  font-size: 1.1rem;
+  color: #718096;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Controls Section */
+.facilities-controls {
+  margin-bottom: 3rem;
 }
 
 .filter-section {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.filter-section label {
-  color: white;
-  font-weight: 500;
-  font-size: 1rem;
-}
-
-.type-filter {
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  color: #2c3e50;
-  cursor: pointer;
-}
-
-.stats-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
   margin-bottom: 2rem;
 }
 
+.filter-section label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+
+.type-filter {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  color: #2d3748;
+  min-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.type-filter:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+/* Stats Section */
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
 .stat-card {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 1rem;
-  border-radius: 8px;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
 }
 
 .stat-number {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #1a202c;
   margin-bottom: 0.5rem;
 }
 
 .stat-label {
-  color: #7f8c8d;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  color: #718096;
   font-weight: 500;
 }
 
-.facilities-grid h2 {
-  color: white;
+/* Facilities Grid */
+.facilities-grid {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #1a202c;
   margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-title::before {
+  content: "🏛️";
   font-size: 1.5rem;
-  font-weight: 500;
 }
 
 .facilities-container {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
-  gap: 1.5rem !important;
-  width: 100% !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 1.5rem;
 }
 
 .facility-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
+  background: white;
+  border-radius: 20px;
   padding: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
 }
 
 .facility-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.facility-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #f093fb, #f5576c);
 }
 
 .facility-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #ecf0f1;
-}
-
-.facility-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .facility-icon {
-  font-size: 1.5rem;
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  border-radius: 16px;
+  color: white;
 }
 
-.facility-title h3 {
-  margin: 0;
-  color: #2c3e50;
-  font-size: 1.2rem;
+.facility-title {
+  font-size: 1.25rem;
   font-weight: 600;
+  color: #1a202c;
+  margin: 0;
+  flex: 1;
 }
 
 .facility-status {
-  color: white;
-  padding: 0.3rem 0.8rem;
+  padding: 0.5rem 1rem;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 600;
+  color: white;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 
 .facility-info {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  flex: 1;
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0.3rem 0;
-  border-bottom: 1px solid #f8f9fa;
+  align-items: flex-start;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f7fafc;
+  min-height: 2rem;
 }
 
 .info-row:last-child {
@@ -202,40 +224,46 @@
 }
 
 .info-label {
-  color: #7f8c8d;
+  font-size: 0.875rem;
+  color: #718096;
   font-weight: 500;
-  font-size: 0.9rem;
+  flex-shrink: 0;
+  width: 80px;
 }
 
 .info-value {
-  color: #2c3e50;
+  font-size: 0.875rem;
   font-weight: 600;
-  font-size: 0.9rem;
+  color: #1a202c;
+  text-align: right;
+  flex: 1;
+  word-wrap: break-word;
+  line-height: 1.4;
 }
 
+/* Occupancy Section */
 .occupancy-section {
   margin-bottom: 1rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
 }
 
 .occupancy-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .occupancy-status {
+  font-size: 0.875rem;
   font-weight: 600;
-  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .occupancy-bar {
   width: 100%;
   height: 8px;
-  background: #ecf0f1;
+  background: #e2e8f0;
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 0.5rem;
@@ -244,69 +272,68 @@
 .occupancy-fill {
   height: 100%;
   transition: width 0.3s ease;
+  border-radius: 4px;
 }
 
 .occupancy-numbers {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
-  color: #7f8c8d;
-  font-weight: 500;
-}
-
-.amenities-section {
-  margin-bottom: 1rem;
-}
-
-.amenities-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.amenity-tag {
-  background: #3498db;
-  color: white;
-  padding: 0.2rem 0.6rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  color: #718096;
   font-weight: 500;
 }
 
 .facility-timestamp {
-  color: #95a5a6;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  color: #a0aec0;
   text-align: center;
-  padding-top: 0.5rem;
-  border-top: 1px solid #ecf0f1;
+  margin: 0;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
-  .app-header {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .app-main {
+  .app {
     padding: 1rem;
   }
 
-  .filter-section {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .stats-section {
-    grid-template-columns: repeat(3, 1fr);
+  .header-title {
+    font-size: 2rem;
   }
 
   .facilities-container {
     grid-template-columns: 1fr;
   }
 
-  .facility-card {
-    padding: 1rem;
+  .stats-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .facility-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .facility-icon {
+    align-self: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-section {
+    grid-template-columns: 1fr;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .info-value {
+    text-align: left;
+    max-width: 100%;
   }
 }

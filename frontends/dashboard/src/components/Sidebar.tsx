@@ -1,10 +1,31 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Home, Wind, Car, Building, Bell } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Home, Wind, Car, Building, Bell, Users, LogOut } from "lucide-react";
 import "./Sidebar.css";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        await fetch("http://localhost:8000/api/auth/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("auth_token");
+      navigate("/login");
+      window.location.reload();
+    }
+  };
 
   const navItems = [
     { path: "/dashboard", label: "Dashboard", icon: Home },
@@ -12,6 +33,7 @@ const Sidebar: React.FC = () => {
     { path: "/traffic", label: "Traffic", icon: Car },
     { path: "/facilities", label: "Facilities", icon: Building },
     { path: "/notifications", label: "Notifications", icon: Bell },
+    { path: "/users", label: "User Management", icon: Users },
   ];
 
   return (
@@ -31,6 +53,11 @@ const Sidebar: React.FC = () => {
             </Link>
           );
         })}
+        <div className="sidebar-divider"></div>
+        <button className="sidebar-item logout-btn" onClick={handleLogout}>
+          <LogOut className="sidebar-icon" />
+          <span>Logout</span>
+        </button>
       </nav>
     </aside>
   );

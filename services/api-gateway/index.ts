@@ -9,6 +9,7 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 import Redis from "ioredis";
 import CircuitBreaker from "opossum";
 import { v4 as uuidv4 } from "uuid";
+import http from "http";
 
 declare global {
   namespace Express {
@@ -144,8 +145,7 @@ const optionalVerifyToken = async (
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as any;
       req.user = decoded;
-    } catch (error) {
-    }
+    } catch (error) {}
   }
   next();
 };
@@ -198,20 +198,47 @@ app.get("/services", (req, res) => {
   });
 });
 
-app.use(
-  "/api/auth",
-  createProxyMiddleware({
-    target: SERVICES.auth.url,
-    changeOrigin: true,
-    pathRewrite: {
-      "^/api/auth": "",
-    },
-    onError: (err, req, res) => {
-      console.error("Auth service proxy error:", err);
+app.use("/api/auth", async (req, res) => {
+  try {
+    const targetUrl = `${SERVICES.auth.url}${req.url.replace("/api/auth", "")}`;
+    console.log(`Proxying ${req.method} ${req.url} to ${targetUrl}`);
+
+    const options = {
+      hostname: "auth-service",
+      port: 8005,
+      path: req.url.replace("/api/auth", ""),
+      method: req.method,
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(JSON.stringify(req.body)),
+      },
+    };
+
+    const proxyReq = http.request(options, (proxyRes) => {
+      let data = "";
+
+      proxyRes.on("data", (chunk) => {
+        data += chunk;
+      });
+
+      proxyRes.on("end", () => {
+        res.status(proxyRes.statusCode || 500).json(JSON.parse(data));
+        console.log(`Proxy response: ${proxyRes.statusCode} for ${req.url}`);
+      });
+    });
+
+    proxyReq.on("error", (error) => {
+      console.error("Auth service proxy error:", error);
       res.status(503).json({ error: "Authentication service unavailable" });
-    },
-  })
-);
+    });
+
+    proxyReq.write(JSON.stringify(req.body));
+    proxyReq.end();
+  } catch (error) {
+    console.error("Auth service proxy error:", error);
+    res.status(503).json({ error: "Authentication service unavailable" });
+  }
+});
 
 app.use(
   "/api/air-quality",

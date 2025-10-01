@@ -5,8 +5,10 @@ import AirQualityWidget from "./components/AirQualityWidget";
 import TrafficWidget from "./components/TrafficWidget";
 import FacilitiesWidget from "./components/FacilitiesWidget";
 import NotificationsWidget from "./components/NotificationsWidget";
-import Header from "./components/Header";
+import UserManagement from "./components/UserManagement";
+import Login from "./components/Login";
 import Sidebar from "./components/Sidebar";
+import Logo from "./components/Logo";
 import "./App.css";
 
 interface ServiceStatus {
@@ -17,6 +19,7 @@ interface ServiceStatus {
 }
 
 const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [serviceStatus, setServiceStatus] = useState<ServiceStatus>({
     airQuality: false,
     traffic: false,
@@ -25,9 +28,13 @@ const App: React.FC = () => {
   });
 
   useEffect(() => {
-    checkServiceHealth();
-    const interval = setInterval(checkServiceHealth, 30000); // Check every 30 seconds
-    return () => clearInterval(interval);
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      setIsAuthenticated(true);
+      checkServiceHealth();
+      const interval = setInterval(checkServiceHealth, 30000);
+      return () => clearInterval(interval);
+    }
   }, []);
 
   const checkServiceHealth = async () => {
@@ -66,9 +73,13 @@ const App: React.FC = () => {
     setServiceStatus(newStatus);
   };
 
+  if (!isAuthenticated) {
+    return <Login onLogin={() => setIsAuthenticated(true)} />;
+  }
+
   return (
     <div className="app">
-      <Header serviceStatus={serviceStatus} />
+      <Logo />
       <div className="app-content">
         <Sidebar />
         <main className="main-content">
@@ -82,6 +93,7 @@ const App: React.FC = () => {
             <Route path="/traffic" element={<TrafficWidget />} />
             <Route path="/facilities" element={<FacilitiesWidget />} />
             <Route path="/notifications" element={<NotificationsWidget />} />
+            <Route path="/users" element={<UserManagement />} />
           </Routes>
         </main>
       </div>

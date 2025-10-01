@@ -71,27 +71,44 @@ const App: React.FC = () => {
   };
 
   const getAirQualityColor = (pm25: number): string => {
-    if (pm25 <= 12) return "#00e400";
-    if (pm25 <= 35) return "#ffff00";
-    if (pm25 <= 55) return "#ff7e00";
-    if (pm25 <= 150) return "#ff0000";
-    return "#8f3f97";
+    if (pm25 <= 12) return "#48bb78";
+    if (pm25 <= 35) return "#ed8936";
+    if (pm25 <= 55) return "#f56565";
+    if (pm25 <= 150) return "#e53e3e";
+    return "#9f7aea";
   };
 
   const getSeverityColor = (severity: string): string => {
     switch (severity.toLowerCase()) {
       case "low":
-        return "#00e400";
+        return "#48bb78";
       case "medium":
-        return "#ffff00";
+        return "#ed8936";
       case "high":
-        return "#ff7e00";
+        return "#f56565";
       case "critical":
-        return "#ff0000";
+        return "#e53e3e";
       default:
-        return "#666";
+        return "#718096";
     }
   };
+
+  const getOverallStats = () => {
+    if (data.length === 0)
+      return { good: 0, moderate: 0, unhealthy: 0, hazardous: 0 };
+
+    const stats = { good: 0, moderate: 0, unhealthy: 0, hazardous: 0 };
+    data.forEach((sensor) => {
+      const pm25 = sensor.data.pm25;
+      if (pm25 <= 12) stats.good++;
+      else if (pm25 <= 35) stats.moderate++;
+      else if (pm25 <= 150) stats.unhealthy++;
+      else stats.hazardous++;
+    });
+    return stats;
+  };
+
+  const stats = getOverallStats();
 
   return (
     <div className="app">
@@ -100,13 +117,46 @@ const App: React.FC = () => {
           <div className="loading">Loading air quality data...</div>
         ) : (
           <>
+            {/* Header Section */}
+            <div className="header-section">
+              <h1 className="header-title">Air Quality Monitoring</h1>
+              <p className="header-subtitle">
+                Real-time air quality data for Novi Sad
+              </p>
+            </div>
+
+            {/* Stats Overview */}
+            <div className="stats-overview">
+              <div className="stat-card">
+                <div className="stat-icon good">✅</div>
+                <div className="stat-number">{stats.good}</div>
+                <div className="stat-label">Good Quality</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon moderate">⚠️</div>
+                <div className="stat-number">{stats.moderate}</div>
+                <div className="stat-label">Moderate</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon unhealthy">🚨</div>
+                <div className="stat-number">{stats.unhealthy}</div>
+                <div className="stat-label">Unhealthy</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon hazardous">☠️</div>
+                <div className="stat-number">{stats.hazardous}</div>
+                <div className="stat-label">Hazardous</div>
+              </div>
+            </div>
+
+            {/* Sensors Grid */}
             <section className="sensors-grid">
-              <h2>Sensor Readings</h2>
+              <h2 className="section-title">Sensor Readings</h2>
               <div className="sensors-container">
                 {data.map((sensor) => (
                   <div key={sensor.id} className="sensor-card">
                     <div className="sensor-header">
-                      <h3>{sensor.location}</h3>
+                      <h3 className="sensor-title">{sensor.location}</h3>
                       <div
                         className="air-quality-index"
                         style={{
@@ -176,25 +226,24 @@ const App: React.FC = () => {
                         </span>
                       </div>
                     </div>
-
-                    <div className="sensor-timestamp">
-                      {new Date(sensor.timestamp).toLocaleString()}
-                    </div>
+                    <p className="sensor-timestamp">
+                      Last updated:{" "}
+                      {new Date(sensor.timestamp).toLocaleTimeString()}
+                    </p>
                   </div>
                 ))}
               </div>
             </section>
 
-            <section className="alerts-section">
-              <h2>Air Quality Alerts</h2>
-              {alerts.length === 0 ? (
-                <div className="no-alerts">No active alerts</div>
-              ) : (
+            {/* Alerts Section */}
+            {alerts.length > 0 && (
+              <section className="alerts-section">
+                <h2 className="section-title">Air Quality Alerts</h2>
                 <div className="alerts-container">
                   {alerts.map((alert) => (
                     <div key={alert.id} className="alert-card">
                       <div className="alert-header">
-                        <h3>{alert.location}</h3>
+                        <h3 className="alert-title">{alert.location}</h3>
                         <div
                           className="alert-severity"
                           style={{
@@ -216,8 +265,8 @@ const App: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              )}
-            </section>
+              </section>
+            )}
           </>
         )}
       </main>

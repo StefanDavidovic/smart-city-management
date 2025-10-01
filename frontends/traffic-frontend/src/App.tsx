@@ -18,7 +18,6 @@ interface TrafficData {
 
 interface TrafficAlert {
   id: string;
-  intersectionId: string;
   location: string;
   alertType: string;
   message: string;
@@ -60,48 +59,64 @@ const App: React.FC = () => {
   };
 
   const getCongestionLevel = (level: number): string => {
-    if (level <= 20) return "Low";
-    if (level <= 40) return "Moderate";
-    if (level <= 60) return "High";
-    if (level <= 80) return "Very High";
+    if (level < 20) return "Low";
+    if (level < 40) return "Moderate";
+    if (level < 60) return "High";
+    if (level < 80) return "Very High";
     return "Severe";
   };
 
   const getCongestionColor = (level: number): string => {
-    if (level <= 20) return "#00e400";
-    if (level <= 40) return "#ffff00";
-    if (level <= 60) return "#ff7e00";
-    if (level <= 80) return "#ff0000";
-    return "#8f3f97";
+    if (level < 20) return "#48bb78";
+    if (level < 40) return "#ed8936";
+    if (level < 60) return "#f56565";
+    if (level < 80) return "#e53e3e";
+    return "#9f7aea";
   };
 
   const getTrafficLightColor = (status: string): string => {
     switch (status.toLowerCase()) {
       case "red":
-        return "#e74c3c";
+        return "#e53e3e";
       case "yellow":
-        return "#f39c12";
+        return "#ed8936";
       case "green":
-        return "#27ae60";
+        return "#48bb78";
       default:
-        return "#95a5a6";
+        return "#718096";
     }
   };
 
   const getSeverityColor = (severity: string): string => {
     switch (severity.toLowerCase()) {
       case "low":
-        return "#00e400";
+        return "#48bb78";
       case "medium":
-        return "#ffff00";
+        return "#ed8936";
       case "high":
-        return "#ff7e00";
+        return "#f56565";
       case "critical":
-        return "#ff0000";
+        return "#e53e3e";
       default:
-        return "#666";
+        return "#718096";
     }
   };
+
+  const getOverallStats = () => {
+    if (data.length === 0) return { low: 0, moderate: 0, high: 0, severe: 0 };
+
+    const stats = { low: 0, moderate: 0, high: 0, severe: 0 };
+    data.forEach((intersection) => {
+      const congestion = intersection.data.congestionLevel;
+      if (congestion < 20) stats.low++;
+      else if (congestion < 40) stats.moderate++;
+      else if (congestion < 80) stats.high++;
+      else stats.severe++;
+    });
+    return stats;
+  };
+
+  const stats = getOverallStats();
 
   return (
     <div className="app">
@@ -110,13 +125,48 @@ const App: React.FC = () => {
           <div className="loading">Loading traffic data...</div>
         ) : (
           <>
+            {/* Header Section */}
+            <div className="header-section">
+              <h1 className="header-title">Traffic Management</h1>
+              <p className="header-subtitle">
+                Real-time traffic data for Novi Sad intersections
+              </p>
+            </div>
+
+            {/* Stats Overview */}
+            <div className="stats-overview">
+              <div className="stat-card">
+                <div className="stat-icon low">🟢</div>
+                <div className="stat-number">{stats.low}</div>
+                <div className="stat-label">Low Congestion</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon moderate">🟡</div>
+                <div className="stat-number">{stats.moderate}</div>
+                <div className="stat-label">Moderate</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon high">🟠</div>
+                <div className="stat-number">{stats.high}</div>
+                <div className="stat-label">High Congestion</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon severe">🔴</div>
+                <div className="stat-number">{stats.severe}</div>
+                <div className="stat-label">Severe</div>
+              </div>
+            </div>
+
+            {/* Intersections Grid */}
             <section className="intersections-grid">
-              <h2>Traffic Intersections</h2>
+              <h2 className="section-title">Traffic Intersections</h2>
               <div className="intersections-container">
                 {data.map((intersection) => (
                   <div key={intersection.id} className="intersection-card">
                     <div className="intersection-header">
-                      <h3>{intersection.location}</h3>
+                      <h3 className="intersection-title">
+                        {intersection.location}
+                      </h3>
                       <div
                         className="congestion-level"
                         style={{
@@ -156,7 +206,7 @@ const App: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="traffic-light-section">
+                    <div className="traffic-light-status-section">
                       <div className="traffic-light-header">
                         <span className="data-label">Traffic Light:</span>
                         <div
@@ -177,25 +227,24 @@ const App: React.FC = () => {
                         </span>
                       </div>
                     </div>
-
-                    <div className="intersection-timestamp">
-                      {new Date(intersection.timestamp).toLocaleString()}
-                    </div>
+                    <p className="intersection-timestamp">
+                      Last updated:{" "}
+                      {new Date(intersection.timestamp).toLocaleTimeString()}
+                    </p>
                   </div>
                 ))}
               </div>
             </section>
 
-            <section className="alerts-section">
-              <h2>Traffic Alerts</h2>
-              {alerts.length === 0 ? (
-                <div className="no-alerts">No active traffic alerts</div>
-              ) : (
+            {/* Alerts Section */}
+            {alerts.length > 0 && (
+              <section className="alerts-section">
+                <h2 className="section-title">Traffic Alerts</h2>
                 <div className="alerts-container">
                   {alerts.map((alert) => (
                     <div key={alert.id} className="alert-card">
                       <div className="alert-header">
-                        <h3>{alert.location}</h3>
+                        <h3 className="alert-title">{alert.location}</h3>
                         <div
                           className="alert-severity"
                           style={{
@@ -217,8 +266,8 @@ const App: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              )}
-            </section>
+              </section>
+            )}
           </>
         )}
       </main>
