@@ -9,11 +9,12 @@ const getRemoteUrl = (serviceName, port) => {
 };
 
 module.exports = {
-  mode: "development",
+  mode: process.env.NODE_ENV || "development",
   devServer: {
     port: 3000,
     host: "0.0.0.0",
     historyApiFallback: true,
+    allowedHosts: "all",
     headers: {
       "Access-Control-Allow-Origin": "*",
     },

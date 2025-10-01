@@ -2,10 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/Card";
 import { Badge } from "./ui/Badge";
 import { Button } from "./ui/Button";
-import { RefreshCw, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import {
+  RefreshCw,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Wifi,
+  WifiOff,
+} from "lucide-react";
 import AirQualityChart from "./charts/AirQualityChart";
 import TrafficChart from "./charts/TrafficChart";
 import FacilitiesChart from "./charts/FacilitiesChart";
+import { useWebSocket } from "../hooks/useWebSocket";
 import "./Dashboard.css";
 
 interface ServiceStatus {
@@ -46,9 +54,65 @@ const Dashboard: React.FC<{ serviceStatus: ServiceStatus }> = ({
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
+  // WebSocket connections for real-time data
+  const airQualityWs = useWebSocket({
+    url: "ws://localhost:8001/ws",
+    onMessage: (message) => {
+      if (message.type === "air_quality_update") {
+        setData((prev) => ({
+          ...prev,
+          airQuality: {
+            ...prev.airQuality,
+            current: message.data,
+          },
+        }));
+        setLastUpdate(new Date());
+      }
+    },
+    onError: (error) => {
+      console.error("Air Quality WebSocket error:", error);
+    },
+    onOpen: () => {
+      console.log("✅ Air Quality WebSocket connected");
+    },
+    onClose: () => {
+      console.log("🔌 Air Quality WebSocket disconnected");
+    },
+    reconnectInterval: 10000, // Increase reconnect interval
+    maxReconnectAttempts: 3, // Reduce max attempts
+  });
+
+  const trafficWs = useWebSocket({
+    url: "ws://localhost:8002/ws",
+    onMessage: (message) => {
+      if (message.type === "traffic_update") {
+        setData((prev) => ({
+          ...prev,
+          traffic: {
+            ...prev.traffic,
+            current: message.data,
+          },
+        }));
+        setLastUpdate(new Date());
+      }
+    },
+    onError: (error) => {
+      console.error("Traffic WebSocket error:", error);
+    },
+    onOpen: () => {
+      console.log("✅ Traffic WebSocket connected");
+    },
+    onClose: () => {
+      console.log("🔌 Traffic WebSocket disconnected");
+    },
+    reconnectInterval: 10000, // Increase reconnect interval
+    maxReconnectAttempts: 3, // Reduce max attempts
+  });
+
   useEffect(() => {
     fetchDashboardData();
-    const interval = setInterval(fetchDashboardData, 10000); // Update every 10 seconds
+    // Reduce polling interval since we have WebSocket updates
+    const interval = setInterval(fetchDashboardData, 30000); // Update every 30 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -132,6 +196,28 @@ const Dashboard: React.FC<{ serviceStatus: ServiceStatus }> = ({
       <div className="dashboard-header">
         <h1 className="dashboard-title">Smart City Dashboard</h1>
         <div className="dashboard-controls">
+          <div className="websocket-status">
+            <div className="status-item">
+              {airQualityWs.isConnected ? (
+                <Wifi className="w-4 h-4" style={{ color: '#10b981' }} />
+              ) : (
+                <WifiOff className="w-4 h-4" style={{ color: '#ef4444' }} />
+              )}
+              <span className="status-text">
+                Air Quality {airQualityWs.isConnected ? '(Connected)' : '(Disconnected)'}
+              </span>
+            </div>
+            <div className="status-item">
+              {trafficWs.isConnected ? (
+                <Wifi className="w-4 h-4" style={{ color: '#10b981' }} />
+              ) : (
+                <WifiOff className="w-4 h-4" style={{ color: '#ef4444' }} />
+              )}
+              <span className="status-text">
+                Traffic {trafficWs.isConnected ? '(Connected)' : '(Disconnected)'}
+              </span>
+            </div>
+          </div>
           <Button
             onClick={fetchDashboardData}
             disabled={loading}

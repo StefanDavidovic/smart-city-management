@@ -211,6 +211,9 @@ app.use("/api/auth", async (req, res) => {
       headers: {
         "Content-Type": "application/json",
         "Content-Length": Buffer.byteLength(JSON.stringify(req.body)),
+        ...(req.headers.authorization && {
+          Authorization: req.headers.authorization,
+        }),
       },
     };
 
@@ -290,7 +293,7 @@ app.use(
 
 app.use(
   "/api/notifications",
-  verifyToken,
+  optionalVerifyToken,
   createProxyMiddleware({
     target: SERVICES.notifications.url,
     changeOrigin: true,

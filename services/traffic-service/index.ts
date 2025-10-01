@@ -75,17 +75,17 @@ const INTERSECTIONS = [
     name: "Trg Slobode",
     coordinates: [45.2671, 19.8335],
   },
-  { id: "intersection-002", name: "Liman", coordinates: [45.2500, 19.8500] },
-  { id: "intersection-003", name: "Detelinara", coordinates: [45.2800, 19.8200] },
+  { id: "intersection-002", name: "Liman", coordinates: [45.25, 19.85] },
+  { id: "intersection-003", name: "Detelinara", coordinates: [45.28, 19.82] },
   {
     id: "intersection-004",
     name: "Grbavica",
-    coordinates: [45.2600, 19.8100],
+    coordinates: [45.26, 19.81],
   },
   {
     id: "intersection-005",
     name: "Telep",
-    coordinates: [45.2400, 19.8400],
+    coordinates: [45.24, 19.84],
   },
 ];
 
@@ -477,10 +477,21 @@ app.get("/alerts", (req, res) => {
   res.json(alerts);
 });
 
-wss.on("connection", (ws) => {
+// WebSocket endpoint
+app.get("/ws", (req, res) => {
+  res.status(426).json({ error: "WebSocket upgrade required" });
+});
+
+wss.on("connection", (ws, req) => {
+  console.log("New WebSocket connection established");
   activeConnections.add(ws);
 
+  ws.on("message", (message) => {
+    console.log("Received message:", message.toString());
+  });
+
   ws.on("close", () => {
+    console.log("WebSocket connection closed");
     activeConnections.delete(ws);
   });
 

@@ -1,11 +1,45 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, Wind, Car, Building, Bell, Users, LogOut } from "lucide-react";
 import "./Sidebar.css";
 
+interface User {
+  id: number;
+  email: string;
+  username: string;
+  full_name: string | null;
+  role: string;
+  is_active: boolean;
+  created_at: string;
+}
+
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        const response = await fetch("http://localhost:8000/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setCurrentUser(data);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch current user:", error);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -33,7 +67,9 @@ const Sidebar: React.FC = () => {
     { path: "/traffic", label: "Traffic", icon: Car },
     { path: "/facilities", label: "Facilities", icon: Building },
     { path: "/notifications", label: "Notifications", icon: Bell },
-    { path: "/users", label: "User Management", icon: Users },
+    ...(currentUser?.role === "admin"
+      ? [{ path: "/users", label: "User Management", icon: Users }]
+      : []),
   ];
 
   return (
